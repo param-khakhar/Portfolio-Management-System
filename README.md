@@ -21,6 +21,7 @@
 
 #### Redis:
 - pip install redis
+- sudo apt-get install redis-server
  
 #### Node:
 - Install npm
