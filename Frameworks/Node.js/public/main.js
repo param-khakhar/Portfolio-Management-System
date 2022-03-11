@@ -57,7 +57,7 @@ $(function () {
         })
         .useInteractiveGuideline(true)
         .showLegend(true)
-        .color(d3.schemeCategory10().range());
+        .color(d3.scale.category10().range());
 
     chart.xAxis
         .axisLabel('Time')
