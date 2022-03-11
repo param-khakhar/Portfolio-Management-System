@@ -17,11 +17,12 @@
     "@node-redis/time-series": "^1.0.2",
     "accepts": "^1.3.8",
     "body-parser": "^1.19.2",
-    "bootstrap": "^3.3.7",
+    "bootstrap": "^3.4.1",
     "bytes": "^3.1.2",
     "cluster-key-slot": "^1.1.0",
     "content-disposition": "^0.5.4",
     "cookie": "^0.4.2",
+    "d3": "^7.3.0",
     "engine.io-client": "^6.1.1",
     "express": "^4.17.3",
     "finalhandler": "^1.1.2",
@@ -29,8 +30,10 @@
     "generic-pool": "^3.8.2",
     "http-errors": "^2.0.0",
     "ipaddr.js": "^2.0.1",
+    "jquery": "^3.6.0",
     "minimist": "^1.2.5",
     "negotiator": "^0.6.3",
+    "nv": "^0.2.0",
     "parseurl": "^1.3.3",
     "proxy-addr": "^2.0.7",
     "range-parser": "^1.2.1",
@@ -44,5 +47,10 @@
     "socket.io": "^1.7.4",
     "toidentifier": "^1.0.1",
     "type-is": "^1.6.18"
+  },
+  "devDependencies": {
+    "@types/d3": "^7.1.0",
+    "@types/jquery": "^3.5.14",
+    "@types/nvd3": "^1.8.42"
   }
 }
