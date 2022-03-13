@@ -75,7 +75,7 @@ def process_stream(stream):
         # print(record)
         # a, b = record.get('StockSymbol'), (float(record.get('Open')),1), (float(record.get('Close')),1), (float(record.get('High')),1), (float(record.get('Low')),1)
         # print(a, b)
-        return record.get('StockSymbol'), (float(record.get('Open')),1), (float(record.get('Close')),1), (float(record.get('High')),1), (float(record.get('Low')),1)
+        return record.get('StockSymbol'), float(record.get('Open')), float(record.get('Close')), float(record.get('High')), float(record.get('Low'))
     
     # stream.map(pair).reduceByKey(lambda a, b: (a[0] + b[0], a[1] + b[1])).map(lambda k, v: (k, v[0]/v[1])).foreachRDD(send_to_kafka)
     # stream.map(pair).reduceByKey(lambda a, b: (a[0] + b[0], a[1] + b[1])).map(lambda k: (k[0], k[1][0]/k[1][1])).foreachRDD(send_to_kafka)
