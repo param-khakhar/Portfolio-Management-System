@@ -82,10 +82,17 @@ $(function () {
 
     function newDataCallback(message) {
         "use strict";
-        var parsed = JSON.parse(message);
-        var timestamp = parsed['timestamp'];
-        var average = parsed['average'];
-        var symbol = parsed['symbol'];
+        const parsed = JSON.parse(message);
+        
+        try {
+	  var obj = JSON.parse(parsed); // this is how you parse a string into JSON 
+	  document.body.innerHTML += obj.hello;
+	} catch (ex) {
+	  console.error(ex);
+	}
+        var timestamp = obj["timestamp"];
+        var average = obj["average"];
+        var symbol = obj["symbol"];
         var point = {};
         point.x = timestamp;
         point.y = average;
@@ -94,6 +101,7 @@ $(function () {
 
         var i = getSymbolIndex(symbol, data_points);
 
+	console.log(data_points);
         data_points[i].values.push(point);
         if (data_points[i].values.length > 100) {
             data_points[i].values.shift();

@@ -52,11 +52,12 @@ console.log('Subscribing to redis topic %s', subscribe_topic);
 //});
 
 client.subscribe('average-stock-price', (message) => {
-  console.log(message); // 'message'
+  // console.log(message); // 'message'
+  io.sockets.emit('data', message);
 });
 
 client.pSubscribe('average-stock-price', (message, channel) => {
-  console.log(message, channel); // 'message', 'channel'
+  // console.log(message, channel); // 'message', 'channel'
 });
 
 //client.on('message', function (channel, message) {
