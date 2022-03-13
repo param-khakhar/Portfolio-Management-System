@@ -108,12 +108,14 @@ def fetch_price(symbol):
         # print("Quotes")
         # price = json.dumps(getQuotes(symbol))
     s = yf.Ticker(symbol)
+    
+    data = yf.download(tickers = symbol, period = '5d', interval = '5m')
         # print(s.history(period = '100d'))
     # price = json.dumps(s.history(period = '100d'))
     df = s.history(period='1d')
     dct = {}
-    for col in df.columns:
-        dct[col] = df[col].values[0]
+    for col in data.columns:
+        dct[col] = data[col].values[-1]
     
     print(dct)
     dct['StockSymbol'] = symbol
