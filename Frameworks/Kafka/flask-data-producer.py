@@ -44,12 +44,14 @@ topic_name = app.config['CONFIG_KAFKA_TOPIC']
 
 print(kafka_broker, topic_name)
 
+stocks = []
+
 producer = KafkaProducer(
     bootstrap_servers=kafka_broker,
     api_version=(0, 10)
 )
 
-schedule = BackgroundScheduler()
+schedule = BackgroundScheduler({'apscheduler.job_defaults.max_instances': 4})
 schedule.add_executor('threadpool')
 schedule.start()
 
@@ -87,48 +89,116 @@ def fetch_price(symbol):
     """
     logger.debug('Start to fetch stock price for %s', symbol)
     
-#    try:
-        # print("Quotes")
-        # price = json.dumps(getQuotes(symbol))
-#        s = yf.Ticker(symbol)
-        # print(s.history(period = '100d'))
-#        price = json.dumps(s.history(period = '100d'))
-#        price = s.history(period = '1d')['Close'].values[0]
-#        bprice = json.dumps(price).encode('utf-8')
+    # print("Symbol:" ,symbol)
+    # s = yf.Ticker(symbol)
+    # print(s.info)
+    
+    # name = s.info['shortName']
 
-#        logger.debug('Retrieved stock info %s', price)
-#        producer.send(topic=topic_name, value=bprice, timestamp_ms=int(time.time()))
-#        logger.info('Sent stock price for %s to Kafka', symbol)
-#    except KafkaTimeoutError as timeout_error:
-#        logger.warning('Failed to send stock price for %s to kafka, caused by: %s', (symbol, timeout_error.message))
-#    except Exception:
-#        logger.warning('Failed to fetch stock price for %s', symbol)
-        
+    # data = s.history(period = '1d', interval = '1m')
+    # print(stocks)
+    data = yf.download(tickers = stocks, period = '1d', interval = '1m', verbose = 0)
     
-        # print("Quotes")
-        # price = json.dumps(getQuotes(symbol))
-    s = yf.Ticker(symbol)
-    
-    data = yf.download(tickers = symbol, period = '5d', interval = '5m')
         # print(s.history(period = '100d'))
     # price = json.dumps(s.history(period = '100d'))
-    df = s.history(period='1d')
-    dct = {}
-    for col in data.columns:
-        dct[col] = data[col].values[-1]
-    
-    print(dct)
-    dct['StockSymbol'] = symbol
-    price = s.history(period = '1d')['Close'].values[0]
-    bprice = json.dumps(dct, cls = NpEncoder).encode('utf-8')
+    data = data.dropna(how = 'any')
 
-    logger.debug('Retrieved stock info %s', price)
-    try:
-        producer.send(topic=topic_name, value=bprice, timestamp_ms=int(time.time()))
-    except KafkaTimeoutError as timeout_error:
-        logger.warning('Failed to send stock price for %s to kafka, caused by: %s', (symbol, timeout_error.message))
-    except Exception:
-        logger.warning('Failed to fetch stock price for %s', symbol)
+    for s in stocks:
+        dct = {}
+        val = 0
+        # print(data.shape)
+        if len(stocks) > 1:
+            val = data['Close'][s].values[-1]
+        else:
+            val = data['Close'].values[-1]
+
+        for col in data.columns:
+            if len(stocks) > 1 and col[1] != s:
+                continue
+            if len(stocks) > 1:    
+                dct[col[0]] = data[col[0]][s].values[-2]
+            else:
+                dct[col] = data[col].values[-2]
+
+        dct['StockSymbol'] = s
+        dct['Price'] = val
+        dct['Name'] = "Empty"
+        bprice = json.dumps(dct, cls = NpEncoder).encode('utf-8')
+        # print(s, bprice)
+        try:
+            producer.send(topic=topic_name, value=bprice, timestamp_ms=int(time.time()))
+        except KafkaTimeoutError as timeout_error:
+            logger.warning('Failed to send stock price for %s to kafka, caused by: %s', (symbol, timeout_error.message))
+        except Exception:
+            logger.warning('Failed to fetch stock price for %s', symbol)
+
+
+def query_price(symbol):
+
+    """
+    helper function to retrieve stock data and send it to kafka
+    :param symbol: symbol of the stock
+    :return: None
+    """
+    logger.debug('Start to fetch stock price for %s', symbol)
+    
+    # print("Symbol:" ,symbol)
+    s = yf.Ticker(symbol)
+    # print(s.info)
+    
+    name = s.info['shortName']
+    data = s.history(period = '1d', interval = '1m')
+    
+    data = data.dropna(how = 'any')
+
+    for s in stocks:
+        dct = {}
+        val = 0
+        # print(data.shape)
+        if len(stocks) > 1:
+            val = data['Close'][s].values[-1]
+        else:
+            val = data['Close'].values[-1]
+
+        for col in data.columns:
+            if len(stocks) > 1 and col[1] != s:
+                continue
+            if len(stocks) > 1:    
+                dct[col[0]] = data[col[0]][s].values[-2]
+            else:
+                dct[col] = data[col].values[-2]
+
+        dct['StockSymbol'] = s
+        dct['Price'] = val
+        dct['Name'] = name
+        bprice = json.dumps(dct, cls = NpEncoder).encode('utf-8')
+        print(s, bprice)
+        try:
+            producer.send(topic=topic_name, value=bprice, timestamp_ms=int(time.time()))
+        except KafkaTimeoutError as timeout_error:
+            logger.warning('Failed to send stock price for %s to kafka, caused by: %s', (symbol, timeout_error.message))
+        except Exception:
+            logger.warning('Failed to fetch stock price for %s', symbol)
+
+
+
+@app.route('/query/<symbol>', methods=['POST'])
+def query_stock(symbol):
+    if not symbol:
+        return jsonify({
+            'error': 'Stock symbol cannot be empty'
+        }), 400
+    if symbol in symbols:
+        pass
+    else:
+        # symbol = symbol.encode('utf-8')
+        stocks.append(symbol)
+        symbols.add(symbol)
+        logger.info('Add stock retrieve job %s' % symbol)
+        # print("Symbol:", symbol, len(symbol))
+        # schedule.add_job(fetch_price, 'interval', [symbol], seconds=1, id=symbol.decode("utf-8"))
+        schedule.add_job(query_price, 'interval', [symbol], seconds=1, id=symbol)
+    return jsonify(results=list(symbols)), 200
 
 
 @app.route('/<symbol>', methods=['POST'])
@@ -141,9 +211,10 @@ def add_stock(symbol):
         pass
     else:
         # symbol = symbol.encode('utf-8')
+        stocks.append(symbol)
         symbols.add(symbol)
         logger.info('Add stock retrieve job %s' % symbol)
-        print("Symbol:", symbol, len(symbol))
+        # print("Symbol:", symbol, len(symbol))
         # schedule.add_job(fetch_price, 'interval', [symbol], seconds=1, id=symbol.decode("utf-8"))
         schedule.add_job(fetch_price, 'interval', [symbol], seconds=1, id=symbol)
     return jsonify(results=list(symbols)), 200
