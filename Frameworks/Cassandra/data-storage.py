@@ -4,6 +4,8 @@
 from cassandra.cluster import Cluster
 from kafka import KafkaConsumer
 from kafka.errors import KafkaError
+from ast import literal_eval
+from datetime import datetime
 
 import argparse
 import atexit
@@ -50,17 +52,19 @@ def persist_data(stock_data, cassandra_session):
 
     :return: None
     """
+    str_stock_data = stock_data.decode('UTF-8')
+    data = literal_eval(str_stock_data)
     try:
-        logger.debug('Start to persist data to cassandra %s', stock_data)
-        parsed = json.loads(stock_data)[0]
-        symbol = parsed.get('StockSymbol')
-        price = float(parsed.get('LastTradePrice'))
-        tradetime = parsed.get('LastTradeDateTime')
+        symbol = str(data['StockSymbol'])
+        price = float(data['Close'])
+        tradetime = str(datetime.now())
+        tradetime = tradetime[:-3]
+        print(data_table, symbol, price, tradetime)
         statement = "INSERT INTO %s (stock_symbol, trade_time, trade_price) VALUES ('%s', '%s', %f)" % (data_table, symbol, tradetime, price)
         cassandra_session.execute(statement)
         logger.info('Persistend data to cassandra for symbol: %s, price: %f, tradetime: %s' % (symbol, price, tradetime))
-    except Exception:
-        logger.error('Failed to persist data to cassandra %s', stock_data)
+    except Exception as e:
+        logger.error('Failed to persist data to cassandra %s', e)
 
 
 def shutdown_hook(consumer, session):

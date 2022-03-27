@@ -3,7 +3,6 @@ click==6.6
 confluent-kafka==0.9.1.2
 Flask==0.11.1
 funcsigs==1.0.2
-futures==3.0.5
 googlefinance==0.7
 itsdangerous==0.24
 Jinja2==2.8

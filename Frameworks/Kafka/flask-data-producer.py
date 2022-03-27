@@ -3,7 +3,6 @@ import logging
 import json
 import time
 
-from googlefinance import getQuotes
 import yfinance as yf
 from apscheduler.schedulers.background import BackgroundScheduler
 
