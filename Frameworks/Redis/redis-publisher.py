@@ -3,9 +3,10 @@
 
 from kafka import KafkaConsumer
 
-import argparse
+import sys
+# import argparse
 import atexit
-import logging
+# import logging
 import redis
 
 # - default kafka topic to write to
@@ -15,11 +16,10 @@ topic_name = 'stock-analyzer'
 kafka_broker = '127.0.0.1:9092'
 
 
-logger_format = '%(asctime)-15s %(message)s'
-logging.basicConfig(format=logger_format)
-logger = logging.getLogger('redis-publisher')
-logger.setLevel(logging.DEBUG)
-
+# logger_format = '%(asctime)-15s %(message)s'
+# logging.basicConfig(format=logger_format)
+# logger = logging.getLogger('redis-publisher')
+# logger.setLevel(logging.DEBUG)
 
 def shutdown_hook(kafka_consumer):
     """
@@ -27,26 +27,25 @@ def shutdown_hook(kafka_consumer):
     :param kafka_consumer: instance of a kafka consumer
     :return: None
     """
-    logger.info('Shutdown kafka consumer')
+    print('Shutdown kafka consumer')
     kafka_consumer.close()
 
-
-if __name__ == '__main__':
+def main():
     # - setup command line arguments
-    parser = argparse.ArgumentParser()
-    parser.add_argument('topic_name', help='the kafka topic consume from')
-    parser.add_argument('kafka_broker', help='the location of the kafka broker')
-    parser.add_argument('redis_channel', help='the redis channel to publish to')
-    parser.add_argument('redis_host', help='the location of the redis server')
-    parser.add_argument('redis_port', help='the redis port')
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument('topic_name', help='the kafka topic consume from')
+    # parser.add_argument('kafka_broker', help='the location of the kafka broker')
+    # parser.add_argument('redis_channel', help='the redis channel to publish to')
+    # parser.add_argument('redis_host', help='the location of the redis server')
+    # parser.add_argument('redis_port', help='the redis port')
 
     # - parse arguments
-    args = parser.parse_args()
-    topic_name = args.topic_name
-    kafka_broker = args.kafka_broker
-    redis_channel = args.redis_channel
-    redis_host = args.redis_host
-    redis_port = args.redis_port
+    # args = parser.parse_args()
+    topic_name = sys.argv[1]
+    kafka_broker = sys.argv[2]
+    redis_channel = sys.argv[3]
+    redis_host = sys.argv[4]
+    redis_port = sys.argv[5]
 
     # - instantiate a simple kafka consumer
     kafka_consumer = KafkaConsumer(
@@ -61,7 +60,7 @@ if __name__ == '__main__':
     atexit.register(shutdown_hook, kafka_consumer)
 
     for msg in kafka_consumer:
-        logger.info('Received new data from kafka %s' % str(msg))
+        print('Received new data from kafka %s' % str(msg))
         redis_client.publish(redis_channel, msg.value)
         print("Published:", redis_channel, msg.value)
 
