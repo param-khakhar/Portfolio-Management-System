@@ -48,22 +48,26 @@ def shutdown_hook(producer):
 def process_stream(stream):
 
     def send_to_kafka(rdd):
+        print('In send to Kafka Function!!')
         results = rdd.collect()
+        # print('Size of Buffer:', results)
         for r in results:
             # print(r)
             data = json.dumps(
                 {
                     'symbol': r[0],
                     'timestamp': time.time(),
-                    'close': r[2],
-                    'open' : r[1],
-                    'high' : r[3],
-                    'low' : r[4],
-                    'volume' : r[5],
-                    'price' : r[6],
-                    'name' : r[7]
+                    'close': r[1][1][0],
+                    'average': r[1][2][0]/r[1][2][1],
+                    'open' : r[1][0][0],
+                    'high' : r[1][3][0],
+                    'low' : r[1][4][0],
+                    'volume' : r[1][5],
+                    'price' : r[1][6],
+                    'name' : r[1][7]
                 }
             )
+            print("Results: ",data)
             try:
                 # logger.info('Sending average price %s to kafka' % data)
                 bprice = json.dumps(data).encode('utf-8')
@@ -73,14 +77,14 @@ def process_stream(stream):
 
     def pairs(data):
         # record = json.loads(data[1].decode('utf-8'))[0]
+        print("Data: ",data[1])
         record = json.loads(data[1])
-        # a, b = record.get('StockSymbol'), (float(record.get('Open')),1), (float(record.get('Close')),1), (float(record.get('High')),1), (float(record.get('Low')),1)
-        # print(a, b)
-        return record.get('StockSymbol'), round(float(record.get('Open')), 2), round(float(record.get('Close')), 2), round(float(record.get('High')), 2), round(float(record.get('Low')), 2), int(record.get('Volume')), round(float(record.get('Price')), 2), record.get('Name')
+        # a, b, c, d, e = record.get('StockSymbol'), (float(record.get('Open')),1), (float(record.get('Close')),1), (float(record.get('High')),1), (float(record.get('Low')),1), round(float(record.get('Price')), 2), record.get('Name')
+        return record.get('StockSymbol'), [(float(record.get('Open')), 1), (float(record.get('Close')), 1), (float(record.get('Close')), 1), (float(record.get('High')), 1), (float(record.get('Low')), 1), int(record.get('Volume')), round(float(record.get('Price')), 1), record.get('Name')]
     
-    # stream.map(pair).reduceByKey(lambda a, b: (a[0] + b[0], a[1] + b[1])).map(lambda k, v: (k, v[0]/v[1])).foreachRDD(send_to_kafka)
+    stream.map(pairs).reduceByKey(lambda l1, l2: (l1[0], l1[1], (l1[2][0]+l2[2][0], l1[2][1]+l2[2][1]), l1[3], l1[4], l1[5], l1[6], l1[7])).foreachRDD(send_to_kafka)
     # stream.map(pair).reduceByKey(lambda a, b: (a[0] + b[0], a[1] + b[1])).map(lambda k: (k[0], k[1][0]/k[1][1])).foreachRDD(send_to_kafka)
-    stream.map(pairs).foreachRDD(send_to_kafka)
+    # stream.map(pairs).foreachRDD(send_to_kafka)
 
 
 if __name__ == '__main__':
