@@ -1,39 +1,20 @@
-# - read from any kafka
-# - write to any cassandra
-# - get message from kafka write to cassandra
 from cassandra.cluster import Cluster
 from kafka import KafkaConsumer
 from kafka.errors import KafkaError
 from ast import literal_eval
 from datetime import datetime
 
-import argparse
+import sys
 import atexit
-import json
-import logging
 
-# - default kafka topic to read from
 topic_name = 'stock-analyzer'
-
-# - default kafka broker location
 kafka_broker = '127.0.0.1:9092'
-
-# - default cassandra nodes to connect
 contact_points = '127.0.0.1'
-
-# - default keyspace to use
 key_space = 'stock'
-
-# - default table to use
 data_table = 'stock'
 
-logger_format = '%(asctime)-15s %(message)s'
-logging.basicConfig(format=logger_format)
-logger = logging.getLogger('data-storage')
-logger.setLevel(logging.DEBUG)
-
-
 def persist_data(stock_data, cassandra_session):
+<<<<<<< HEAD
     """
     persist stock data into cassandra
     :param stock_data:
@@ -52,6 +33,8 @@ def persist_data(stock_data, cassandra_session):
 
     :return: None
     """
+=======
+>>>>>>> 0cf6e74066020e17b5819e43fa7e487f75c16d1f
     str_stock_data = stock_data.decode('UTF-8')
     data = literal_eval(str_stock_data)
     try:
@@ -59,50 +42,42 @@ def persist_data(stock_data, cassandra_session):
         price = float(data['Close'])
         tradetime = str(datetime.now())
         tradetime = tradetime[:-3]
+<<<<<<< HEAD
         print(data_table, symbol, price, tradetime)
         statement = "INSERT INTO %s (stock_symbol, trade_time, trade_price) VALUES ('%s', '%s', %f)" % (data_table, symbol, tradetime, price)
         cassandra_session.execute(statement)
         logger.info('Persistend data to cassandra for symbol: %s, price: %f, tradetime: %s' % (symbol, price, tradetime))
     except Exception as e:
         logger.error('Failed to persist data to cassandra %s', e)
+=======
+        statement = "INSERT INTO %s (stock_symbol, trade_time, trade_price) VALUES ('%s', '%s', %f)" % (data_table, symbol, tradetime, price)
+        cassandra_session.execute(statement)
+        print('Persistend data to cassandra for symbol: %s, price: %f, tradetime: %s' % (symbol, price, tradetime))
+    except Exception as e:
+        print('Failed to persist data to cassandra %s', e)
+>>>>>>> 0cf6e74066020e17b5819e43fa7e487f75c16d1f
 
 
 def shutdown_hook(consumer, session):
-    """
-    a shutdown hook to be called before the shutdown
-    :param consumer: instance of a kafka consumer
-    :param session: instance of a cassandra session
-    :return: None
-    """
     try:
-        logger.info('Closing Kafka Consumer')
         consumer.close()
-        logger.info('Kafka Consumer closed')
-        logger.info('Closing Cassandra Session')
         session.shutdown()
-        logger.info('Cassandra Session closed')
+        print('Cassandra Session closed')
     except KafkaError as kafka_error:
-        logger.warn('Failed to close Kafka Consumer, caused by: %s', kafka_error.message)
+        print('Failed to close Kafka Consumer, caused by: %s', kafka_error.message)
     finally:
-        logger.info('Existing program')
+        print('Exiting program')
+
 
 
 if __name__ == '__main__':
-    # - setup command line arguments
-    parser = argparse.ArgumentParser()
-    parser.add_argument('topic_name', help='the kafka topic to subscribe from')
-    parser.add_argument('kafka_broker', help='the location of the kafka broker')
-    parser.add_argument('key_space', help='the keyspace to use in cassandra')
-    parser.add_argument('data_table', help='the data table to use')
-    parser.add_argument('contact_points', help='the contact points for cassandra')
 
     # - parse arguments
-    args = parser.parse_args()
-    topic_name = args.topic_name
-    kafka_broker = args.kafka_broker
-    key_space = args.key_space
-    data_table = args.data_table
-    contact_points = args.contact_points
+    topic_name = sys.argv[1]
+    kafka_broker = sys.argv[2]
+    key_space = sys.argv[3]
+    data_table = sys.argv[4]
+    contact_points = sys.argv[5]
 
     # - initiate a simple kafka consumer
     consumer = KafkaConsumer(
