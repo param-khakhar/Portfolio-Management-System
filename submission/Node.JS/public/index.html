@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+    <meta charset="utf-8">
+    <title>Stock Visualizer</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/readable/bootstrap.min.css">
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.6/nv.d3.min.css" integrity="sha512-5HktH3p+qBNLzxpOLnpICH2uwArYE/Fi7fdKCQee15piDqN3X3Q1iqo8D43oc8DJgYP4xxA7sdEjNCfmeLLYeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+
+<script src="https://cdn.anychart.com/releases/v8/js/anychart-base.min.js"></script>
+<script src="https://cdn.anychart.com/releases/v8/js/anychart-ui.min.js"></script>
+<script src="https://cdn.anychart.com/releases/v8/js/anychart-exports.min.js"></script>
+<script src="https://cdn.anychart.com/releases/v8/js/anychart-stock.min.js"></script>
+<script src="https://cdn.anychart.com/releases/v8/js/anychart-data-adapter.min.js"></script>
+<link href="https://cdn.anychart.com/releases/v8/css/anychart-ui.min.css" type="text/css" rel="stylesheet">
+
+<script src="https://cdn.anychart.com/releases/v8/js/anychart-base.min.js"></script>
+<script src="https://cdn.anychart.com/releases/8.11.0/js/anychart-base.min.js"></script>
+<script src="https://cdn.anychart.com/releases/v8/js/anychart-ui.min.js"></script>
+<script src="https://cdn.anychart.com/releases/v8/js/anychart-exports.min.js"></script>
+<script src="https://cdn.anychart.com/releases/v8/js/anychart-stock.min.js"></script>
+<script src="https://cdn.anychart.com/csv-data/msft-daily-short.js"></script>
+<script src="https://cdn.anychart.com/csv-data/orcl-daily-short.js"></script>
+<script src="https://cdn.anychart.com/csv-data/csco-daily-short.js"></script>
+<script src="https://cdn.anychart.com/csv-data/ibm-daily-short.js"></script>
+<link href="https://cdn.anychart.com/releases/v8/css/anychart-ui.min.css" type="text/css" rel="stylesheet">
+<link href="https://cdn.anychart.com/releases/v8/fonts/css/anychart-font.min.css" type="text/css" rel="stylesheet">
+
+<script src="https://cdn.anychart.com/releases/8.10.0/js/anychart-core.min.js"></script>
+<script src="https://cdn.anychart.com/releases/8.10.0/js/anychart-stock.min.js"></script>
+<style type="text/css">      
+    html, body, #container { 
+      width: 100%; height: 100%; margin: 0; padding: 0; text-align: center;
+    }
+    h1{text-align: left; font-size: xx-large;} 
+
+    body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        }
+
+    .topnav {
+        overflow: hidden;
+        background-color: #333;
+        }
+
+    .topnav a {
+        float: left;
+        color: #f2f2f2;
+        text-align: center;
+        padding: 14px 16px;
+        text-decoration: none;
+        font-size: 17px;
+        }
+
+    .topnav a:hover {
+        background-color: #ddd;
+        color: black;
+        }
+
+    .topnav a.active {
+        background-color: #04AA6D;
+        color: white;
+        }
+  </style>
+
+
+</head>
+<body class="container">
+<div class="page-header" id="header">
+    <div class="row">
+        <div class="col-lg-7 col-md-8 col-sm-7">
+            <h1>Real Time Portfolio Management Service</h1>
+            <!-- <i class="lead" style="font-family:Tahoma;color:#636EC6;size:0em"></i> -->
+        </div>
+    </div>
+</div>
+<div class="topnav">
+  <a class="active" href="#home">Home</a>
+  <a href="vis.html">Visualizer</a>
+  <a href="portf.html">Portfolio Tracker</a>
+  <a href="about.html">Architecture Design</a>
+</div>
+
+<section>
+    <h4>What?</h4>
+    <div class="row">
+        <p>
+            A tool to keep track of your portfolio in real-time. Use the Visualizer in order to get the live chart of the asset, and use the portfolio tracker in order
+            to keep track of the current value of your portfolio.
+        </p>
+    </div>
+</section>
+
+<section>
+    <h4>How?</h4>
+    <div class="row">
+        <p>
+            We display the quotes downloaded from <a href="https://finance.yahoo.com/">Yahoo Finance</a>, using the <a href="https://pypi.org/project/yfinance/">Python API</a>.
+            Along with that, we use several frameworks that aid in distributed computing and storage such as <a href="">Kafka</a>, <a href="">Cassandra</a>, <a href="">Redis</a>, and <a href="">Spark</a>.
+            We used <a href="">Flask</a> and <a href="">Node.JS</a> for our frontend. For more detailed explanation visit <a href="">Architecture Design</a><div class=""></div>
+        </p>
+    </div>
+</section>
+
+<section>
+    <h4>Who?</h4>
+    <div class="row">
+        <ul style="list-style-type:none;">
+        <li>Pratik Pranav - 2018CS10368</li>
+        <li>Param Khakhar - 2018CS0362</li>
+        <li>Manav Modi - 2018CS10353</li>
+      </ul>
+    </div>
+    <p>
+        All three of us are     enrolled for the course COL733: Cloud Computing Fundamentals, in what is our final semester (hopefully!).
+    </p>
+</section>
+</body>
+</html>

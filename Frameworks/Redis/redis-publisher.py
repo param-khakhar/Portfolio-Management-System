@@ -30,7 +30,7 @@ def shutdown_hook(kafka_consumer):
     print('Shutdown kafka consumer')
     kafka_consumer.close()
 
-def main():
+if __name__ == '__main__':
     # - setup command line arguments
     # parser = argparse.ArgumentParser()
     # parser.add_argument('topic_name', help='the kafka topic consume from')

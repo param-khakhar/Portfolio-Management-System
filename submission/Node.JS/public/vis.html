@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+    <meta charset="utf-8">
+    <title>Visualizer</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/readable/bootstrap.min.css">
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.6/nv.d3.min.css" integrity="sha512-5HktH3p+qBNLzxpOLnpICH2uwArYE/Fi7fdKCQee15piDqN3X3Q1iqo8D43oc8DJgYP4xxA7sdEjNCfmeLLYeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+
+<script src="https://cdn.anychart.com/releases/v8/js/anychart-base.min.js"></script>
+<script src="https://cdn.anychart.com/releases/v8/js/anychart-ui.min.js"></script>
+<script src="https://cdn.anychart.com/releases/v8/js/anychart-exports.min.js"></script>
+<script src="https://cdn.anychart.com/releases/v8/js/anychart-stock.min.js"></script>
+<script src="https://cdn.anychart.com/releases/v8/js/anychart-data-adapter.min.js"></script>
+<link href="https://cdn.anychart.com/releases/v8/css/anychart-ui.min.css" type="text/css" rel="stylesheet">
+
+<script src="https://cdn.anychart.com/releases/v8/js/anychart-base.min.js"></script>
+<script src="https://cdn.anychart.com/releases/8.11.0/js/anychart-base.min.js"></script>
+<script src="https://cdn.anychart.com/releases/v8/js/anychart-ui.min.js"></script>
+<script src="https://cdn.anychart.com/releases/v8/js/anychart-exports.min.js"></script>
+<script src="https://cdn.anychart.com/releases/v8/js/anychart-stock.min.js"></script>
+<script src="https://cdn.anychart.com/csv-data/msft-daily-short.js"></script>
+<script src="https://cdn.anychart.com/csv-data/orcl-daily-short.js"></script>
+<script src="https://cdn.anychart.com/csv-data/csco-daily-short.js"></script>
+<script src="https://cdn.anychart.com/csv-data/ibm-daily-short.js"></script>
+<link href="https://cdn.anychart.com/releases/v8/css/anychart-ui.min.css" type="text/css" rel="stylesheet">
+<link href="https://cdn.anychart.com/releases/v8/fonts/css/anychart-font.min.css" type="text/css" rel="stylesheet">
+
+<script src="https://cdn.anychart.com/releases/8.10.0/js/anychart-core.min.js"></script>
+<script src="https://cdn.anychart.com/releases/8.10.0/js/anychart-stock.min.js"></script>
+<style type="text/css">      
+    html, body, #container { 
+      width: 100%; height: 100%; margin: 0; padding: 0; text-align: center;
+    }
+    h1{text-align: left; font-size: xx-large;} 
+
+    h2{text-align: left; font-size: large;} 
+
+    body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        }
+
+    .topnav {
+        overflow: hidden;
+        background-color: #333;
+        }
+
+    .topnav a {
+        float: left;
+        color: #f2f2f2;
+        text-align: center;
+        padding: 14px 16px;
+        text-decoration: none;
+        font-size: 17px;
+        }
+
+    .topnav a:hover {
+        background-color: #ddd;
+        color: black;
+        }
+
+    .topnav a.active {
+        background-color: #04AA6D;
+        color: white;
+        }
+  </style>
+
+
+</head>
+<body class="container">
+<div class="page-header" id="header">
+    <div class="row">
+        <div class="col-lg-8 col-md-8 col-sm-8">
+            <h1>Visualizer</h1>
+            <i class="lead" style="font-family:Tahoma;color:#636EC6"></i>
+        </div>
+    </div>
+</div>
+<div class="topnav">
+    <a class="active" href="index.html">Home</a>
+    <a href="vis.html">Visualizer</a>
+    <a href="portf.html">Portfolio Tracker</a>
+    <a href="about.html">Architecture Design</a>
+</div>
+
+<div class="col-lg-8 col-md-8 col-sm-8">
+    <i class="lead" style="font-family:Tahoma;color:#636EC6"></i>
+</div>
+
+
+<div class="row">
+
+    <h2>The visualizer would display the real time quotes, volumes, candlesticks, and exponential moving average for any stock or cryptocurrency. Enter the symbol to proceed. For eg MSFT for Microsoft Stock, UBER for Uber Stock</h2>
+
+    <div>
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="Symbol" id="stock-symbol">
+            <span class="input-group-btn">
+                <button class="btn btn-default" type="button" id="add-stock-button">Add</button>
+            </span>
+        </div>
+        <br>
+        <div class="list-group table-of-contents" id="stock-list">
+        </div>
+    </div>
+</div>
+
+<div id="container">
+</div>
+<!---<script src="https://d3js.org/d3.v3.js"></script>--->
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/jquery/jquery.min.js"></script>
+
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>-->
+
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.3.0/d3.min.js" integrity="sha512-NMhzM2RHzbCRO0s5VPaRC+2bW6nmNXimzC9p5sp2x19M+zzuSJ2T50dEQ7hpHkNjnX1mt8nQg1NNthwRZgsoIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> --->
+
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.9.7/d3.min.js"></script> -->
+
+<!-- <script src="/d3/d3.min.js"></script>
+<script src="/nvd3/nv.d3.min.js"></script>-->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.0.0/d3.min.js"></script>
+
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.6/nv.d3.min.js" integrity="sha512-ldXL88WIgBA+vAsJu2PepKp3VUvwuyqmXKEbcf8rKeAI56K8GZMb2jfKSm1a36m5AfUzyDp3TIY0iVKY8ciqSg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
+
+<!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script> -->
+<!---<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.3.0/d3.js" integrity="sha512-nkC97gUNsbPjaWQm5GVpreTVy9IJO+z13y1M8mM+1BJRjfp9sz+1ixWu4+1mOMUzIt72pVD9rwjxJKV8LdlvjA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>--->
+
+<script src="/vis.js"></script>
+
+<script src="https://cdn.anychart.com/releases/8.10.0/js/anychart-core.min.js"></script>
+<script src="https://cdn.anychart.com/releases/8.10.0/js/anychart-stock.min.js"></script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.3/nv.d3.min.css"/>
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script> -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.5/nv.d3.min.js"></script>
+</body>
+</html>

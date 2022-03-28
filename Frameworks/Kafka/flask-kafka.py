@@ -32,6 +32,8 @@ topic_name = 'stock-analyzer'                                       # Channel to
 
 stocks = []                                                         # Global list of stock symbols, which gets updated
 symbols = set()
+names = {}                                                          # Dictionary storing names of the symbols.
+
 
 producer = KafkaProducer(bootstrap_servers=kafka_broker, api_version=(0, 10))
 
@@ -74,7 +76,15 @@ def fetch_price(symbol):
     :param symbol: symbol of the stock
     :return: None
     """
-    print('Start to fetch stock price for %s', symbol)
+
+    print("Fetching Price")
+    if symbol not in names:
+        print(symbol)
+        s = yf.Ticker(symbol)
+        names[symbol] = s.info['shortName']
+
+
+    print('Start to fetch stock price for', symbol)
     data = yf.download(tickers = stocks, period = '1d', interval = '1m', verbose = 0)
 
     # Drop rows in the end containing any NaNs
@@ -98,7 +108,7 @@ def fetch_price(symbol):
 
         dct['StockSymbol'] = s
         dct['Price'] = val
-        dct['Name'] = "Empty"
+        dct['Name'] = names[s]
 
         # Encode the above dct, to be sent into the message queue.
         bprice = json.dumps(dct, cls = NpEncoder).encode('utf-8')
@@ -172,6 +182,7 @@ def query_stock(symbol):
     if symbol in symbols:
         pass
     else:
+
         stocks.append(symbol)
         symbols.add(symbol)
         logger.info('Add stock retrieve job %s' % symbol)
