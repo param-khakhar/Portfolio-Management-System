@@ -14,7 +14,6 @@ key_space = 'stock'
 data_table = 'stock'
 
 def persist_data(stock_data, cassandra_session):
-<<<<<<< HEAD
     """
     persist stock data into cassandra
     :param stock_data:
@@ -33,8 +32,6 @@ def persist_data(stock_data, cassandra_session):
 
     :return: None
     """
-=======
->>>>>>> 0cf6e74066020e17b5819e43fa7e487f75c16d1f
     str_stock_data = stock_data.decode('UTF-8')
     data = literal_eval(str_stock_data)
     try:
@@ -42,20 +39,19 @@ def persist_data(stock_data, cassandra_session):
         price = float(data['Close'])
         tradetime = str(datetime.now())
         tradetime = tradetime[:-3]
-<<<<<<< HEAD
+
         print(data_table, symbol, price, tradetime)
         statement = "INSERT INTO %s (stock_symbol, trade_time, trade_price) VALUES ('%s', '%s', %f)" % (data_table, symbol, tradetime, price)
         cassandra_session.execute(statement)
         logger.info('Persistend data to cassandra for symbol: %s, price: %f, tradetime: %s' % (symbol, price, tradetime))
     except Exception as e:
         logger.error('Failed to persist data to cassandra %s', e)
-=======
         statement = "INSERT INTO %s (stock_symbol, trade_time, trade_price) VALUES ('%s', '%s', %f)" % (data_table, symbol, tradetime, price)
         cassandra_session.execute(statement)
         print('Persistend data to cassandra for symbol: %s, price: %f, tradetime: %s' % (symbol, price, tradetime))
     except Exception as e:
         print('Failed to persist data to cassandra %s', e)
->>>>>>> 0cf6e74066020e17b5819e43fa7e487f75c16d1f
+
 
 
 def shutdown_hook(consumer, session):
